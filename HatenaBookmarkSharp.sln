@@ -5,7 +5,11 @@ VisualStudioVersion = 16.0.30907.101
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{BA67F778-BD73-4831-9871-FC615276A1B7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HatenaBookmarkSharp", "src\HatenaBookmarkSharp\HatenaBookmarkSharp.csproj", "{F9678CA9-55EB-4C9F-976B-6094D1F49A75}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HatenaBookmarkSharp", "src\HatenaBookmarkSharp\HatenaBookmarkSharp.csproj", "{F9678CA9-55EB-4C9F-976B-6094D1F49A75}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{59290B4B-4B7C-493C-B346-0E5C176C82CD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HatenaBookmarkSharp.Tests", "test\HatenaBookmarkSharp.Tests\HatenaBookmarkSharp.Tests.csproj", "{B9C97335-189C-4167-82AF-81343BD0501E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,12 +21,17 @@ Global
 		{F9678CA9-55EB-4C9F-976B-6094D1F49A75}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F9678CA9-55EB-4C9F-976B-6094D1F49A75}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F9678CA9-55EB-4C9F-976B-6094D1F49A75}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B9C97335-189C-4167-82AF-81343BD0501E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B9C97335-189C-4167-82AF-81343BD0501E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B9C97335-189C-4167-82AF-81343BD0501E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B9C97335-189C-4167-82AF-81343BD0501E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{F9678CA9-55EB-4C9F-976B-6094D1F49A75} = {BA67F778-BD73-4831-9871-FC615276A1B7}
+		{B9C97335-189C-4167-82AF-81343BD0501E} = {59290B4B-4B7C-493C-B346-0E5C176C82CD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1DDB781B-2492-4EDA-8BEE-CDFEE34A51E4}

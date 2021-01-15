@@ -57,7 +57,7 @@ namespace HatenaBookmarkSharp
             response.EnsureSuccessStatusCode();
             var responseBody = await response.Content.ReadAsStringAsync()
                 .ConfigureAwait(false);
-            var bookmark = JsonSerializer.Deserialize<Bookmark>(responseBody);
+            var bookmark = Deserialize<Bookmark>(responseBody);
             return bookmark!;
         }
 
@@ -75,7 +75,14 @@ namespace HatenaBookmarkSharp
                 .ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
             var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-            var result = JsonSerializer.Deserialize<T>(json);
+            return Deserialize<T>(json);
+        }
+
+        static T Deserialize<T>(string json)
+        {
+            var options = new JsonSerializerOptions(JsonSerializerDefaults.Web);
+            options.Converters.Add(new DateTimeConverter());
+            var result = JsonSerializer.Deserialize<T>(json, options);
             return result!;
         }
     }
