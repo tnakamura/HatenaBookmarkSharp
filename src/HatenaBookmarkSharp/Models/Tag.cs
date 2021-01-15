@@ -15,6 +15,6 @@ namespace HatenaBookmarkSharp.Models
         public DateTime ModifiedDateTime { get; set; }
 
         [JsonPropertyName("modified_epoch")]
-        public int ModifiedEpoch { get; set; }
+        public long ModifiedEpoch { get; set; }
     }
 }

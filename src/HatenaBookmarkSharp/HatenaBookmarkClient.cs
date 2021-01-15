@@ -81,7 +81,7 @@ namespace HatenaBookmarkSharp
         static T Deserialize<T>(string json)
         {
             var options = new JsonSerializerOptions(JsonSerializerDefaults.Web);
-            options.Converters.Add(new DateTimeConverter());
+            options.Converters.Add(DateTimeConverter.Default);
             var result = JsonSerializer.Deserialize<T>(json, options);
             return result!;
         }

@@ -6,6 +6,10 @@ namespace HatenaBookmarkSharp
 {
     class DateTimeConverter : JsonConverter<DateTime>
     {
+        internal static readonly DateTimeConverter Default = new DateTimeConverter();
+
+        DateTimeConverter() { }
+
         public override DateTime Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             return DateTime.Parse(reader.GetString());
