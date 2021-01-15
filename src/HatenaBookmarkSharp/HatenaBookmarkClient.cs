@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System;
+using System.Net.Http.Headers;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
@@ -13,15 +14,21 @@ namespace HatenaBookmarkSharp
     {
         readonly HttpClient httpClient;
 
-        public HatenaBookmarkClient()
-            : this(new HttpClient())
-        {
-        }
+        readonly HatenaBookmarkClientOptions options;
 
-        public HatenaBookmarkClient(HttpClient httpClient)
+        public HatenaBookmarkClient(
+            HttpClient? httpClient = null,
+            HatenaBookmarkClientOptions? options = null)
         {
-            this.httpClient = httpClient;
+            this.options = options ?? new HatenaBookmarkClientOptions(); ;
+            this.httpClient = httpClient ?? new HttpClient();
             this.httpClient.BaseAddress = new Uri("https://bookmark.hatenaapis.com");
+            if (this.options.AccessToken != null)
+            {
+                this.httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+                    "Bearer",
+                    this.options.AccessToken);
+            }
         }
 
         public Task<Bookmark> GetBookmarkAsync(Uri url)
