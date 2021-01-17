@@ -10,7 +10,7 @@ using HatenaBookmarkSharp.Models;
 
 namespace HatenaBookmarkSharp
 {
-    public class HatenaBookmarkClient : IHatenaBookmarkClient
+    public partial class HatenaBookmarkClient : IHatenaBookmarkClient
     {
         readonly HttpClient httpClient;
 
