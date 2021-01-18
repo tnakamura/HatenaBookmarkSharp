@@ -6,7 +6,7 @@ namespace HatenaBookmarkSharp
     public class PostRequest
     {
         [JsonPropertyName("url")]
-        public Uri Url { get; set; }
+        public Uri Uri { get; set; }
 
         [JsonPropertyName("comment")]
         public string Comment { get; set; }

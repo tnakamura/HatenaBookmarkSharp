@@ -287,7 +287,7 @@ namespace HatenaBookmarkSharp.Tests
                 new HttpClient(mock.Object));
             var bookmark = await client.PostBookmarkAsync(new PostRequest
             {
-                Url = new Uri("https://tnakamura.hatenablog.com"),
+                Uri = new Uri("https://tnakamura.hatenablog.com"),
                 Comment = "self bookmarked",
                 IsPostMixi = false,
                 IsPostEvernote = true,

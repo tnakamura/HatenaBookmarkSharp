@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System;
+using System.Threading;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -31,27 +32,42 @@ namespace HatenaBookmarkSharp
             }
         }
 
-        public Task<Bookmark> GetBookmarkAsync(Uri url)
+        public Task<Bookmark> GetBookmarkAsync(
+            Uri uri,
+            CancellationToken cancellationToken = default)
         {
-            return GetAsync<Bookmark>($"/rest/1/my/bookmark?url={url}");
+            return GetAsync<Bookmark>(
+                $"/rest/1/my/bookmark?url={uri}",
+                cancellationToken);
         }
 
-        public Task<Entry> GetEntryAsync(Uri url)
+        public Task<Entry> GetEntryAsync(
+            Uri uri,
+            CancellationToken cancellationToken = default)
         {
-            return GetAsync<Entry>($"/rest/1/entry?url={url}");
+            return GetAsync<Entry>(
+                $"/rest/1/entry?url={uri}",
+                cancellationToken);
         }
 
-        public Task<User> GetMyAsync()
+        public Task<User> GetMyAsync(CancellationToken cancellationToken = default)
         {
-            return GetAsync<User>($"/rest/1/my");
+            return GetAsync<User>(
+                $"/rest/1/my",
+                cancellationToken);
         }
 
-        public Task<IReadOnlyList<Tag>> GetMyTagsAsync()
+        public Task<IReadOnlyList<Tag>> GetMyTagsAsync(
+            CancellationToken cancellationToken = default)
         {
-            return GetAsync<IReadOnlyList<Tag>>($"/rest/1/my/tags");
+            return GetAsync<IReadOnlyList<Tag>>(
+                $"/rest/1/my/tags",
+                cancellationToken);
         }
 
-        public async Task<Bookmark> PostBookmarkAsync(PostRequest parameter)
+        public async Task<Bookmark> PostBookmarkAsync(
+            PostRequest parameter,
+            CancellationToken cancellationToken = default)
         {
             var requestBody = JsonSerializer.Serialize(parameter);
             var response = await httpClient.PostAsync(
@@ -59,7 +75,8 @@ namespace HatenaBookmarkSharp
                 new StringContent(
                     requestBody,
                     Encoding.UTF8,
-                    "application/json"))
+                    "application/json"),
+                cancellationToken)
                 .ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
             var responseBody = await response.Content.ReadAsStringAsync()
@@ -68,20 +85,27 @@ namespace HatenaBookmarkSharp
             return bookmark!;
         }
 
-        public async Task DeleteBookmarkAsync(Uri url)
+        public async Task DeleteBookmarkAsync(
+            Uri uri,
+            CancellationToken cancellationToken = default)
         {
             var response = await httpClient
-                .DeleteAsync($"/rest/1/my/bookmark?url={url}")
+                .DeleteAsync(
+                    $"/rest/1/my/bookmark?url={uri}",
+                    cancellationToken)
                 .ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
         }
 
-        async Task<T> GetAsync<T>(string requestUri)
+        async Task<T> GetAsync<T>(
+            string requestUri,
+            CancellationToken cancellationToken = default)
         {
-            var response = await httpClient.GetAsync(requestUri)
+            var response = await httpClient.GetAsync(requestUri, cancellationToken)
                 .ConfigureAwait(false);
             response.EnsureSuccessStatusCode();
-            var json = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var json = await response.Content.ReadAsStringAsync()
+                .ConfigureAwait(false);
             return Deserialize<T>(json);
         }
 
@@ -91,6 +115,29 @@ namespace HatenaBookmarkSharp
             options.Converters.Add(DateTimeConverter.Default);
             var result = JsonSerializer.Deserialize<T>(json, options);
             return result!;
+        }
+
+        public Task<RequestToken> GetRequestTokenAsync()
+        {
+            return Task.FromResult(new RequestToken
+            {
+            });
+        }
+
+        public Uri GenerateAuthenticationUri(string requestToken)
+        {
+            return new Uri("");
+        }
+
+        public Task<AccessToken> GetAccessTokenAsync(string authenticationCode)
+        {
+            return Task.FromResult(new AccessToken
+            {
+            });
+        }
+
+        public void SetAccessToken(string accessToken)
+        {
         }
     }
 }
