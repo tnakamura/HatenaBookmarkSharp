@@ -305,6 +305,16 @@ namespace HatenaBookmarkSharp.Tests
             Assert.True(bookmark.IsPrivate);
             mock.VerifyAll();
         }
+
+        [Fact]
+        public void GenerateAuthenticationUriTest()
+        {
+            var client = new HatenaBookmarkClient();
+            var uri = client.GenerateAuthenticationUri("QB%2FfqbXTpFB1GQ%3D%3D");
+            Assert.Equal(
+                new Uri("https://www.hatena.ne.jp/oauth/authorize?oauth_token=QB%2FfqbXTpFB1GQ%3D%3D"),
+                uri);
+        }
     }
 }
 

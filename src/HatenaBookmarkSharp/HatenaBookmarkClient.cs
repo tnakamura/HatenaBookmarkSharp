@@ -1,11 +1,13 @@
 ﻿#nullable enable
+using System.Security.Cryptography;
+using System.Linq;
 using System;
-using System.Threading;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using HatenaBookmarkSharp.Models;
 
@@ -24,12 +26,6 @@ namespace HatenaBookmarkSharp
             this.options = options ?? new HatenaBookmarkClientOptions(); ;
             this.httpClient = httpClient ?? new HttpClient();
             this.httpClient.BaseAddress = new Uri("https://bookmark.hatenaapis.com");
-            if (this.options.AccessToken != null)
-            {
-                this.httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
-                    "Bearer",
-                    this.options.AccessToken);
-            }
         }
 
         public Task<Bookmark> GetBookmarkAsync(
@@ -117,16 +113,67 @@ namespace HatenaBookmarkSharp
             return result!;
         }
 
-        public Task<RequestToken> GetRequestTokenAsync()
+        public async Task<RequestToken> GetRequestTokenAsync(CancellationToken cancellationToken = default)
         {
-            return Task.FromResult(new RequestToken
+            var content = new FormUrlEncodedContent(
+                new Dictionary<string, string>()
+                {
+                    ["scope"] = "read_public,read_private",
+                });
+
+            var request = new HttpRequestMessage(
+                HttpMethod.Post,
+                "https://www.hatena.com/oauth/initiate")
             {
-            });
+                Content = content,
+            };
+
+            var bytes = await content.ReadAsByteArrayAsync();
+            var hmacsha1 = new HMACSHA1(Encoding.UTF8.GetBytes(options.OAuthConsumerSecret));
+            var hash = hmacsha1.ComputeHash(bytes);
+            var oauthSignature = Convert.ToBase64String(hash);
+            var nonce = Guid.NewGuid().ToString("N");
+            var timestamp = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds;
+            var oauthParameter = "realm=\"\","
+                + "oauth_callback=\"oob\","
+                + "oauth_consumer_key=\"" + options.OAuthConsumerKey + "\","
+                + "oauth_nonce=\"" + nonce + "\","
+                + "oauth_signature=\"" + oauthSignature + "\","
+                + "oauth_signature_method=\"HMAC-SHA1\","
+                + "oauth_timestamp=\"" + timestamp + "\","
+                + "oauth_version=\"1.0\"";
+            request.Headers.Authorization = new AuthenticationHeaderValue(
+                scheme: "OAuth",
+                parameter: oauthParameter);
+
+            var response = await httpClient.SendAsync(request, cancellationToken);
+
+            response.EnsureSuccessStatusCode();
+
+            var body = await response.Content.ReadAsStringAsync();
+
+            var parsedBody = ParseFormUrlEncoded(body);
+
+            return new RequestToken
+            {
+                OAuthToken = parsedBody["oauth_token"],
+                OAuthTokenSecret = parsedBody["oauth_token_secret"],
+                OAuthCallbackConfirmed = bool.Parse(parsedBody["oauth_callback_confirmed"]),
+            };
+        }
+
+        static IDictionary<string, string> ParseFormUrlEncoded(string formUrlEncoded)
+        {
+            return formUrlEncoded.Split('&')
+                .Select(x => x.Split('='))
+                .Where(x => x.Length == 2)
+                .ToDictionary(x => x[0], x => x[1]);
         }
 
         public Uri GenerateAuthenticationUri(string requestToken)
         {
-            return new Uri("");
+            return new Uri(
+                $"https://www.hatena.ne.jp/oauth/authorize?oauth_token={requestToken}");
         }
 
         public Task<AccessToken> GetAccessTokenAsync(string authenticationCode)
@@ -138,6 +185,7 @@ namespace HatenaBookmarkSharp
 
         public void SetAccessToken(string accessToken)
         {
+            options.AccessToken = accessToken;
         }
     }
 }
