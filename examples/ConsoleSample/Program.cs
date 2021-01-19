@@ -1,18 +1,37 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using ConsoleAppFramework;
 using HatenaBookmarkSharp;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 
 namespace ConsoleSample
 {
-    class Program
+    class Program : ConsoleAppBase
     {
         static async Task Main(string[] args)
         {
-            var client = new HatenaBookmarkClient(
-                options: new HatenaBookmarkClientOptions
+            await Host.CreateDefaultBuilder()
+                .ConfigureServices((hostContext, services) =>
                 {
-                });
+                    services.Configure<HatenaBookmarkClientOptions>(hostContext.Configuration);
+                })
+                .RunConsoleAppFrameworkAsync<Program>(args);
+        }
+
+        readonly IOptions<HatenaBookmarkClientOptions> options;
+
+        public Program(IOptions<HatenaBookmarkClientOptions> options)
+        {
+            this.options = options;
+        }
+
+        public async Task Run()
+        {
+            var client = new HatenaBookmarkClient(
+                options: options.Value);
 
             var requestToken = await client.GetRequestTokenAsync();
 
