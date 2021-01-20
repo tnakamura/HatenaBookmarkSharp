@@ -1,15 +1,26 @@
 ﻿#nullable enable
-using System;
 namespace HatenaBookmarkSharp.Models
 {
     public class AccessToken
     {
-        public string? OAuthToken { get; set; }
+        public AccessToken(
+            string oAuthToken,
+            string oAuthTokenSecret,
+            string urlName,
+            string displayName)
+        {
+            OAuthToken = oAuthToken;
+            OAuthTokenSecret = oAuthTokenSecret;
+            UrlName = urlName;
+            DisplayName = displayName;
+        }
 
-        public string? OAuthTokenSecret { get; set; }
+        public string OAuthToken { get; }
 
-        public string? UrlName { get; set; }
+        public string OAuthTokenSecret { get; }
 
-        public string? DisplayName { get; set; }
+        public string UrlName { get; }
+
+        public string DisplayName { get; }
     }
 }

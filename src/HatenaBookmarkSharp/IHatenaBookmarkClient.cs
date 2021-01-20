@@ -19,5 +19,11 @@ namespace HatenaBookmarkSharp
         Task<IReadOnlyList<Tag>> GetMyTagsAsync(CancellationToken cancellationToken = default);
 
         Task<User> GetMyAsync(CancellationToken cancellationToken = default);
+
+        Task<RequestToken> GetRequestTokenAsync(CancellationToken cancellationToken = default);
+
+        Task<AccessToken> GetAccessTokenAsync(string authenticationCode, CancellationToken cancellationToken = default);
+
+        Uri GenerateAuthenticationUri(string requestToken);
     }
 }

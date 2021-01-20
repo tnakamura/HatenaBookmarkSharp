@@ -1,10 +1,10 @@
 ﻿#nullable enable
-using System.Security.Cryptography;
-using System.Linq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
@@ -118,7 +118,7 @@ namespace HatenaBookmarkSharp
             var content = new FormUrlEncodedContent(
                 new Dictionary<string, string>()
                 {
-                    ["scope"] = "read_public,read_private",
+                    ["scope"] = options.Scope!,
                 });
 
             var request = new HttpRequestMessage(
@@ -154,12 +154,14 @@ namespace HatenaBookmarkSharp
 
             var parsedBody = ParseFormUrlEncoded(body);
 
-            return new RequestToken
+            var result = new RequestToken
             {
                 OAuthToken = parsedBody["oauth_token"],
                 OAuthTokenSecret = parsedBody["oauth_token_secret"],
                 OAuthCallbackConfirmed = bool.Parse(parsedBody["oauth_callback_confirmed"]),
             };
+
+            return result;
         }
 
         static IDictionary<string, string> ParseFormUrlEncoded(string formUrlEncoded)
@@ -176,11 +178,51 @@ namespace HatenaBookmarkSharp
                 $"https://www.hatena.ne.jp/oauth/authorize?oauth_token={requestToken}");
         }
 
-        public Task<AccessToken> GetAccessTokenAsync(string authenticationCode)
+        public async Task<AccessToken> GetAccessTokenAsync(
+            string authenticationCode,
+            CancellationToken cancellationToken = default)
         {
-            return Task.FromResult(new AccessToken
+            var content = new FormUrlEncodedContent(
+                new Dictionary<string, string>());
+
+            var request = new HttpRequestMessage(
+                HttpMethod.Post,
+                "https://www.hatena.com/oauth/token")
             {
-            });
+                Content = content,
+            };
+
+            var bytes = await content.ReadAsByteArrayAsync();
+            var hmacsha1 = new HMACSHA1(Encoding.UTF8.GetBytes(options.OAuthConsumerSecret));
+            var hash = hmacsha1.ComputeHash(bytes);
+            var oauthSignature = Convert.ToBase64String(hash);
+            var nonce = Guid.NewGuid().ToString("N");
+            var timestamp = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds;
+            var oauthParameter = "realm=\"\","
+                + "oauth_consumer_key=\"" + options.OAuthConsumerKey + "\","
+                + "oauth_nonce=\"" + nonce + "\","
+                + "oauth_signature=\"" + oauthSignature + "\","
+                + "oauth_signature_method=\"HMAC-SHA1\","
+                + "oauth_timestamp=\"" + timestamp + "\","
+                + "oauth_verifier=\"" + authenticationCode + "\","
+                + "oauth_version=\"1.0\"";
+            request.Headers.Authorization = new AuthenticationHeaderValue(
+                scheme: "OAuth",
+                parameter: oauthParameter);
+
+            var response = await httpClient.SendAsync(request, cancellationToken);
+
+            response.EnsureSuccessStatusCode();
+
+            var body = await response.Content.ReadAsStringAsync();
+
+            var parsedBody = ParseFormUrlEncoded(body);
+
+            return new AccessToken(
+                oAuthToken: parsedBody["oauth_token"],
+                oAuthTokenSecret: parsedBody["oauth_token_secret"],
+                urlName: parsedBody["url_name"],
+                displayName: parsedBody["display_name"]);
         }
 
         public void SetAccessToken(string accessToken)
