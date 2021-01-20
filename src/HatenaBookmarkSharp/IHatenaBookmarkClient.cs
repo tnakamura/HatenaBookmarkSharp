@@ -22,7 +22,10 @@ namespace HatenaBookmarkSharp
 
         Task<RequestToken> GetRequestTokenAsync(CancellationToken cancellationToken = default);
 
-        Task<AccessToken> GetAccessTokenAsync(string authenticationCode, CancellationToken cancellationToken = default);
+        Task<AccessToken> GetAccessTokenAsync(
+            string authenticationCode,
+            RequestToken requestToken,
+            CancellationToken cancellationToken = default);
 
         Uri GenerateAuthenticationUri(string requestToken);
     }

@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
@@ -18,6 +17,14 @@ namespace HatenaBookmarkSharp
         readonly HttpClient httpClient;
 
         readonly HatenaBookmarkClientOptions options;
+
+        static HatenaBookmarkClient()
+        {
+            OAuth.OAuthUtility.ComputeHash = (key, buffer) =>
+            {
+                return new HMACSHA1(key).ComputeHash(buffer);
+            };
+        }
 
         public HatenaBookmarkClient(
             HttpClient? httpClient = null,
@@ -115,61 +122,37 @@ namespace HatenaBookmarkSharp
 
         public async Task<RequestToken> GetRequestTokenAsync(CancellationToken cancellationToken = default)
         {
-            var content = new FormUrlEncodedContent(
-                new Dictionary<string, string>()
+            var authorizer = CreateAuthorizer();
+
+            var response = await authorizer.GetRequestToken(
+                "https://www.hatena.com/oauth/initiate",
+                new Dictionary<string, string>
                 {
                     ["scope"] = options.Scope!,
                 });
 
-            var request = new HttpRequestMessage(
-                HttpMethod.Post,
-                "https://www.hatena.com/oauth/initiate")
+            var callbackConfirmed = response.ExtraData["oauth_callback_confirmed"]
+                .Select(x => bool.Parse(x))
+                .FirstOrDefault();
+
+            return new RequestToken
             {
-                Content = content,
+                OAuthToken = response.Token.Key,
+                OAuthTokenSecret = response.Token.Secret,
+                OAuthCallbackConfirmed = callbackConfirmed,
             };
-
-            var bytes = await content.ReadAsByteArrayAsync();
-            var hmacsha1 = new HMACSHA1(Encoding.UTF8.GetBytes(options.OAuthConsumerSecret));
-            var hash = hmacsha1.ComputeHash(bytes);
-            var oauthSignature = Convert.ToBase64String(hash);
-            var nonce = Guid.NewGuid().ToString("N");
-            var timestamp = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds;
-            var oauthParameter = "realm=\"\","
-                + "oauth_callback=\"oob\","
-                + "oauth_consumer_key=\"" + options.OAuthConsumerKey + "\","
-                + "oauth_nonce=\"" + nonce + "\","
-                + "oauth_signature=\"" + oauthSignature + "\","
-                + "oauth_signature_method=\"HMAC-SHA1\","
-                + "oauth_timestamp=\"" + timestamp + "\","
-                + "oauth_version=\"1.0\"";
-            request.Headers.Authorization = new AuthenticationHeaderValue(
-                scheme: "OAuth",
-                parameter: oauthParameter);
-
-            var response = await httpClient.SendAsync(request, cancellationToken);
-
-            response.EnsureSuccessStatusCode();
-
-            var body = await response.Content.ReadAsStringAsync();
-
-            var parsedBody = ParseFormUrlEncoded(body);
-
-            var result = new RequestToken
-            {
-                OAuthToken = parsedBody["oauth_token"],
-                OAuthTokenSecret = parsedBody["oauth_token_secret"],
-                OAuthCallbackConfirmed = bool.Parse(parsedBody["oauth_callback_confirmed"]),
-            };
-
-            return result;
         }
 
-        static IDictionary<string, string> ParseFormUrlEncoded(string formUrlEncoded)
+        OAuth.OAuthAuthorizer CreateAuthorizer()
         {
-            return formUrlEncoded.Split('&')
-                .Select(x => x.Split('='))
-                .Where(x => x.Length == 2)
-                .ToDictionary(x => x[0], x => x[1]);
+            if (options.OAuthConsumerKey == null ||
+                options.OAuthConsumerSecret == null)
+            {
+                throw new InvalidOperationException();
+            }
+            return new OAuth.OAuthAuthorizer(
+                consumerKey: options.OAuthConsumerKey,
+                consumerSecret: options.OAuthConsumerSecret);
         }
 
         public Uri GenerateAuthenticationUri(string requestToken)
@@ -180,49 +163,25 @@ namespace HatenaBookmarkSharp
 
         public async Task<AccessToken> GetAccessTokenAsync(
             string authenticationCode,
+            RequestToken requestToken,
             CancellationToken cancellationToken = default)
         {
-            var content = new FormUrlEncodedContent(
-                new Dictionary<string, string>());
+            var authorizer = CreateAuthorizer();
 
-            var request = new HttpRequestMessage(
-                HttpMethod.Post,
-                "https://www.hatena.com/oauth/token")
-            {
-                Content = content,
-            };
+            var response = await authorizer.GetAccessToken(
+                "https://www.hatena.com/oauth/token",
+                requestToken: new OAuth.RequestToken(
+                    key: requestToken.OAuthToken,
+                    secret: requestToken.OAuthTokenSecret),
+                verifier: authenticationCode);
 
-            var bytes = await content.ReadAsByteArrayAsync();
-            var hmacsha1 = new HMACSHA1(Encoding.UTF8.GetBytes(options.OAuthConsumerSecret));
-            var hash = hmacsha1.ComputeHash(bytes);
-            var oauthSignature = Convert.ToBase64String(hash);
-            var nonce = Guid.NewGuid().ToString("N");
-            var timestamp = (DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0)).TotalSeconds;
-            var oauthParameter = "realm=\"\","
-                + "oauth_consumer_key=\"" + options.OAuthConsumerKey + "\","
-                + "oauth_nonce=\"" + nonce + "\","
-                + "oauth_signature=\"" + oauthSignature + "\","
-                + "oauth_signature_method=\"HMAC-SHA1\","
-                + "oauth_timestamp=\"" + timestamp + "\","
-                + "oauth_verifier=\"" + authenticationCode + "\","
-                + "oauth_version=\"1.0\"";
-            request.Headers.Authorization = new AuthenticationHeaderValue(
-                scheme: "OAuth",
-                parameter: oauthParameter);
-
-            var response = await httpClient.SendAsync(request, cancellationToken);
-
-            response.EnsureSuccessStatusCode();
-
-            var body = await response.Content.ReadAsStringAsync();
-
-            var parsedBody = ParseFormUrlEncoded(body);
-
+            var urlName = response.ExtraData["url_name"].FirstOrDefault() ?? "";
+            var displayName = response.ExtraData["display_name"].FirstOrDefault() ?? "";
             return new AccessToken(
-                oAuthToken: parsedBody["oauth_token"],
-                oAuthTokenSecret: parsedBody["oauth_token_secret"],
-                urlName: parsedBody["url_name"],
-                displayName: parsedBody["display_name"]);
+                oAuthToken: response.Token.Key,
+                oAuthTokenSecret: response.Token.Secret,
+                urlName: urlName,
+                displayName: displayName);
         }
 
         public void SetAccessToken(string accessToken)

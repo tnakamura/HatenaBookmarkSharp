@@ -2,7 +2,7 @@
 
 namespace HatenaBookmarkSharp.OAuth
 {
-    public abstract class Token
+    internal abstract class Token
     {
         public string Key { get; private set; }
 
@@ -15,7 +15,7 @@ namespace HatenaBookmarkSharp.OAuth
         }
     }
 
-    public sealed class AccessToken : Token
+    internal class AccessToken : Token
     {
         public AccessToken(string key, string secret)
             : base(key, secret)
@@ -23,7 +23,7 @@ namespace HatenaBookmarkSharp.OAuth
         }
     }
 
-    public sealed class RequestToken : Token
+    internal class RequestToken : Token
     {
         public RequestToken(string key, string secret)
             : base(key, secret)

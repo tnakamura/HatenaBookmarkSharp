@@ -66,8 +66,11 @@ namespace HatenaBookmarkSharp.OAuth
             }
 
             var headerParams = OAuthUtility.BuildBasicParameters(
-                consumerKey, consumerSecret,
-                request.RequestUri.OriginalString, request.Method, token,
+                consumerKey,
+                consumerSecret,
+                request.RequestUri.OriginalString,
+                request.Method,
+                token,
                 sendParameter);
             headerParams = headerParams.Concat(parameters);
 
