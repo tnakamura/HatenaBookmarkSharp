@@ -7,7 +7,7 @@ using System.Text;
 
 namespace HatenaBookmarkSharp.OAuth
 {
-    public static class OAuthUtility
+    internal static class OAuthUtility
     {
         public delegate byte[] HashFunction(byte[] key, byte[] buffer);
 
@@ -89,5 +89,11 @@ namespace HatenaBookmarkSharp.OAuth
             var hash = ComputeHash(Encoding.UTF8.GetBytes(hmacKeyBase), Encoding.UTF8.GetBytes(signatureBase));
             return Convert.ToBase64String(hash).UrlEncode();
         }
+
+        public static HttpClient CreateOAuthClient(string consumerKey, string consumerSecret, AccessToken accessToken, IEnumerable<KeyValuePair<string, string>>? optionalOAuthHeaderParameters = null) =>
+            new HttpClient(new OAuthMessageHandler(consumerKey, consumerSecret, accessToken, optionalOAuthHeaderParameters));
+
+        public static HttpClient CreateOAuthClient(HttpMessageHandler innerHandler, string consumerKey, string consumerSecret, AccessToken accessToken, IEnumerable<KeyValuePair<string, string>>? optionalOAuthHeaderParameters = null) =>
+            new HttpClient(new OAuthMessageHandler(innerHandler, consumerKey, consumerSecret, accessToken, optionalOAuthHeaderParameters));
     }
 }
