@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Security.Cryptography;
-using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -72,19 +71,29 @@ namespace HatenaBookmarkSharp
             PostRequest parameter,
             CancellationToken cancellationToken = default)
         {
-            var requestBody = JsonSerializer.Serialize(parameter);
             var response = await httpClient.PostAsync(
                 $"/rest/1/my/bookmark",
-                new StringContent(
-                    requestBody,
-                    Encoding.UTF8,
-                    "application/json"),
+                new FormUrlEncodedContent(new Dictionary<string, string>
+                {
+                    ["url"] = parameter.Uri.ToString(),
+                    ["comment"] = parameter.Comment.ToString(),
+                    ["post_twitter"] = parameter.IsPostTwitter.ToString(),
+                    ["post_facebook"] = parameter.IsPostFacebook.ToString(),
+                    ["post_mixi"] = parameter.IsPostMixi.ToString(),
+                    ["post_evernote"] = parameter.IsPostEvernote.ToString(),
+                    ["send_mail"] = parameter.IsSendMail.ToString(),
+                    ["private"] = parameter.IsPrivate.ToString(),
+                }),
                 cancellationToken)
                 .ConfigureAwait(false);
+
             response.EnsureSuccessStatusCode();
+
             var responseBody = await response.Content.ReadAsStringAsync()
                 .ConfigureAwait(false);
+
             var bookmark = Deserialize<Bookmark>(responseBody);
+
             return bookmark!;
         }
 
