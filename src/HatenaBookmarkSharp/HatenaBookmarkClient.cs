@@ -148,12 +148,10 @@ namespace HatenaBookmarkSharp
                 .Select(x => bool.Parse(x))
                 .FirstOrDefault();
 
-            return new RequestToken
-            {
-                OAuthToken = response.Token.Key,
-                OAuthTokenSecret = response.Token.Secret,
-                OAuthCallbackConfirmed = callbackConfirmed,
-            };
+            return new RequestToken(
+                oAuthToken: response.Token.Key,
+                oAuthTokenSecret: response.Token.Secret,
+                oAuthCallbackConfirmed: callbackConfirmed);
         }
 
         OAuth.OAuthAuthorizer CreateAuthorizer()

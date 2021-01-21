@@ -251,8 +251,7 @@ namespace HatenaBookmarkSharp.Tests
                         m.RequestUri == new Uri("https://bookmark.hatenaapis.com/rest/1/my/bookmark") &&
                         m.Content.ReadAsStringAsync().Result.Contains("url") &&
                         m.Content.ReadAsStringAsync().Result.Contains("comment") &&
-                        m.Content.ReadAsStringAsync().Result.Contains("self bookmarked") &&
-                        m.Content.ReadAsStringAsync().Result.Contains("post_twitter") &&
+                        m.Content.ReadAsStringAsync().Result.Contains("self+bookmarked") &&
                         m.Content.ReadAsStringAsync().Result.Contains("private")),
                     It.IsAny<CancellationToken>()))
                 .Returns(() =>

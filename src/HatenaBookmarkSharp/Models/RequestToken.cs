@@ -1,13 +1,22 @@
 ﻿#nullable enable
-using System;
 
 namespace HatenaBookmarkSharp.Models
 {
-    public class RequestToken
+    public sealed class RequestToken
     {
-        public string? OAuthToken { get; set; }
+        public RequestToken(
+            string oAuthToken,
+            string oAuthTokenSecret,
+            bool oAuthCallbackConfirmed)
+        {
+            OAuthToken = oAuthToken;
+            OAuthTokenSecret = oAuthTokenSecret;
+            OAuthCallbackConfirmed = oAuthCallbackConfirmed;
+        }
 
-        public string? OAuthTokenSecret { get; set; }
+        public string OAuthToken { get; set; }
+
+        public string OAuthTokenSecret { get; set; }
 
         public bool OAuthCallbackConfirmed { get; set; }
     }

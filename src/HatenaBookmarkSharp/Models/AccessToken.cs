@@ -1,7 +1,7 @@
 ﻿#nullable enable
 namespace HatenaBookmarkSharp.Models
 {
-    public class AccessToken
+    public sealed class AccessToken
     {
         public AccessToken(
             string oAuthToken,
