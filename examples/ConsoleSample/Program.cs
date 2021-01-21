@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using ConsoleAppFramework;
 using HatenaBookmarkSharp;
@@ -37,13 +38,31 @@ namespace ConsoleSample
 
             var authenticationUri = client.GenerateAuthenticationUri(
                 requestToken.OAuthToken);
-            Process.Start(authenticationUri.ToString());
+            Console.WriteLine(authenticationUri);
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                var escapedUrl = authenticationUri.ToString().Replace("&", "^&");
+                Process.Start(new ProcessStartInfo("cmd", $"/c start {escapedUrl}")
+                {
+                    CreateNoWindow = true,
+                });
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                Process.Start("xdg-open", authenticationUri.ToString());
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
+                Process.Start("open", authenticationUri.ToString());
+            }
 
             Console.Write("authenticationCode:");
+
             var authenticationCode = Console.ReadLine();
 
             var accessToken = await client.GetAccessTokenAsync(
-                authenticationCode);
+                authenticationCode,
+                requestToken);
             client.SetAccessToken(accessToken.OAuthToken);
 
             var user = await client.GetMyAsync();

@@ -59,7 +59,11 @@ namespace HatenaBookmarkSharp.OAuth
         {
             if (requestTokenUrl == null) throw new ArgumentNullException(nameof(requestTokenUrl));
 
-            var handler = new OAuthMessageHandler(consumerKey, consumerSecret, token: null, optionalOAuthHeaderParameters: parameters);
+            var handler = new OAuthMessageHandler(
+                consumerKey,
+                consumerSecret,
+                token: null,
+                optionalOAuthHeaderParameters: parameters);
             return GetTokenResponse(
                 requestTokenUrl,
                 handler,

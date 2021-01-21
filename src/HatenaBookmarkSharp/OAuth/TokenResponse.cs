@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace HatenaBookmarkSharp.OAuth
 {
-    public sealed class TokenResponse<T> where T : Token
+    internal sealed class TokenResponse<T> where T : Token
     {
         public T Token { get; }
 

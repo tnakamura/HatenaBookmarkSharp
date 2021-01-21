@@ -125,11 +125,15 @@ namespace HatenaBookmarkSharp
             var authorizer = CreateAuthorizer();
 
             var response = await authorizer.GetRequestToken(
-                "https://www.hatena.com/oauth/initiate",
-                new Dictionary<string, string>
+                requestTokenUrl: "https://www.hatena.com/oauth/initiate",
+                parameters: new Dictionary<string, string>
+                {
+                    ["oauth_callback"] = "oob",
+                },
+                postValue: new FormUrlEncodedContent(new Dictionary<string, string>
                 {
                     ["scope"] = options.Scope!,
-                });
+                }));
 
             var callbackConfirmed = response.ExtraData["oauth_callback_confirmed"]
                 .Select(x => bool.Parse(x))
