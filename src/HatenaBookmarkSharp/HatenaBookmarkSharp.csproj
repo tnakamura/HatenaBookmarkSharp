@@ -6,10 +6,13 @@
     <Version>0.0.1</Version>
     <Authors>tnakamura</Authors>
     <Company>tnakamura</Company>
-    <Copyright></Copyright>
+    <Copyright>tnakamura</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <RepositoryUrl>https://github.com/tnakamura/HatenaBookmarkSharp.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/tnakamura/HatenaBookmarkSharp</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System.Diagnostics;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -11,6 +12,14 @@ namespace HatenaBookmarkSharp
     public sealed class HatenaBookmarkClient : IHatenaBookmarkClient
     {
         readonly HttpClient httpClient;
+
+        readonly static JsonSerializerOptions jsonSerializerOptions;
+
+        static HatenaBookmarkClient()
+        {
+            jsonSerializerOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web);
+            jsonSerializerOptions.Converters.Add(DateTimeConverter.Default);
+        }
 
         public HatenaBookmarkClient(
             string consumerKey,
@@ -150,9 +159,13 @@ namespace HatenaBookmarkSharp
 
         static T Deserialize<T>(string json)
         {
-            var options = new JsonSerializerOptions(JsonSerializerDefaults.Web);
-            options.Converters.Add(DateTimeConverter.Default);
-            var result = JsonSerializer.Deserialize<T>(json, options);
+#if DEBUG
+            if (Debugger.IsAttached)
+            {
+                Console.WriteLine(json);
+            }
+#endif
+            var result = JsonSerializer.Deserialize<T>(json, jsonSerializerOptions);
             return result!;
         }
     }
