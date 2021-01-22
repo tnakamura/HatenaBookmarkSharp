@@ -83,9 +83,11 @@ namespace HatenaBookmarkSharp
             PostRequest parameter,
             CancellationToken cancellationToken = default)
         {
-            var response = await httpClient.PostAsync(
-                $"/rest/1/my/bookmark",
-                new FormUrlEncodedContent(new Dictionary<string, string>
+            var request = new HttpRequestMessage(
+                HttpMethod.Post,
+                "/rest/1/my/bookmark")
+            {
+                Content = new FormUrlEncodedContent(new Dictionary<string, string>
                 {
                     ["url"] = parameter.Uri.ToString(),
                     ["comment"] = parameter.Comment.ToString(),
@@ -96,10 +98,10 @@ namespace HatenaBookmarkSharp
                     ["send_mail"] = parameter.IsSendMail.ToString(),
                     ["private"] = parameter.IsPrivate.ToString(),
                 }),
-                cancellationToken)
-                .ConfigureAwait(false);
+            };
 
-            response.EnsureSuccessStatusCode();
+            var response = await SendAsync(request, cancellationToken)
+                .ConfigureAwait(false);
 
             var responseBody = await response.Content.ReadAsStringAsync()
                 .ConfigureAwait(false);
@@ -113,24 +115,33 @@ namespace HatenaBookmarkSharp
             Uri uri,
             CancellationToken cancellationToken = default)
         {
-            var response = await httpClient
-                .DeleteAsync(
-                    $"/rest/1/my/bookmark?url={uri}",
-                    cancellationToken)
+            var request = new HttpRequestMessage(
+                HttpMethod.Delete,
+                $"/rest/1/my/bookmark?url={uri}");
+            await SendAsync(request, cancellationToken)
                 .ConfigureAwait(false);
-            response.EnsureSuccessStatusCode();
         }
 
         async Task<T> GetAsync<T>(
             string requestUri,
             CancellationToken cancellationToken = default)
         {
-            var response = await httpClient.GetAsync(requestUri, cancellationToken)
+            var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
+            var response = await SendAsync(request, cancellationToken)
                 .ConfigureAwait(false);
-            response.EnsureSuccessStatusCode();
             var json = await response.Content.ReadAsStringAsync()
                 .ConfigureAwait(false);
             return Deserialize<T>(json);
+        }
+
+        async Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request,
+            CancellationToken cancellationToken = default)
+        {
+            var response = await httpClient.SendAsync(request, cancellationToken)
+                .ConfigureAwait(false);
+            response.EnsureSuccessStatusCode();
+            return response;
         }
 
         static T Deserialize<T>(string json)
