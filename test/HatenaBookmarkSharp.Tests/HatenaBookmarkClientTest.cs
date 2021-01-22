@@ -36,19 +36,16 @@ namespace HatenaBookmarkSharp.Tests
                         StatusCode = HttpStatusCode.OK,
                         Content = new StringContent(
                         $@"{{
+                            ""eid"": ""4648574598291681089"",
                             ""comment"": ""self bookmarked"",
+                            ""comment_raw"": ""[blog]self bookmarked"",
                             ""created_datetime"": ""{now:R}"",
                             ""created_epoch"": {now.ToUnixTime()},
                             ""user"": ""griefworker"",
                             ""permalink"": ""https://tnakamura.hatenablog.com/"",
                             ""private"": false,
                             ""tags"": [
-                              {{
-                                 ""tag"": ""blog"",
-                                 ""count"": 1,
-                                 ""modified_datetime"": ""{now:R}"",
-                                 ""modified_epoch"": {now.ToUnixTime()}
-                              }}
+                              ""blog""
                             ]
                           }}",
                         Encoding.UTF8,
@@ -66,10 +63,11 @@ namespace HatenaBookmarkSharp.Tests
                 new Uri("https://tnakamura.hatenablog.com"));
 
             Assert.NotNull(bookmark);
+            Assert.Equal("4648574598291681089", bookmark.Id);
             Assert.Equal("self bookmarked", bookmark.Comment);
+            Assert.Equal("[blog]self bookmarked", bookmark.CommentRaw);
             Assert.Single(bookmark.Tags);
-            Assert.Equal("blog", bookmark.Tags[0].Name);
-            Assert.Equal(1, bookmark.Tags[0].Count);
+            Assert.Equal("blog", bookmark.Tags[0]);
             mock.VerifyAll();
         }
 
@@ -285,19 +283,16 @@ namespace HatenaBookmarkSharp.Tests
                         StatusCode = HttpStatusCode.OK,
                         Content = new StringContent(
                         $@"{{
+                            ""eid"": ""4648574598291681089"",
                             ""comment"": ""self bookmarked"",
+                            ""comment_raw"": ""[blog]self bookmarked"",
                             ""created_datetime"": ""{now:R}"",
                             ""created_epoch"": {now.ToUnixTime()},
                             ""user"": ""griefworker"",
                             ""permalink"": ""https://tnakamura.hatenablog.com/"",
                             ""private"": true,
                             ""tags"": [
-                              {{
-                                 ""tag"": ""blog"",
-                                 ""count"": 1,
-                                 ""modified_datetime"": ""{now:R}"",
-                                 ""modified_epoch"": {now.ToUnixTime()}
-                              }}
+                              ""blog""
                             ]
                           }}",
                         Encoding.UTF8,
@@ -314,7 +309,7 @@ namespace HatenaBookmarkSharp.Tests
             var bookmark = await client.PostBookmarkAsync(new PostRequest
             {
                 Uri = new Uri("https://tnakamura.hatenablog.com"),
-                Comment = "self bookmarked",
+                Comment = "[blog]self bookmarked",
                 IsPostMixi = false,
                 IsPostEvernote = true,
                 IsPostTwitter = true,
@@ -324,6 +319,7 @@ namespace HatenaBookmarkSharp.Tests
             });
 
             Assert.NotNull(bookmark);
+            Assert.Equal("4648574598291681089", bookmark.Id);
             Assert.Equal("self bookmarked", bookmark.Comment);
             Assert.Equal(
                 new Uri("https://tnakamura.hatenablog.com/"),

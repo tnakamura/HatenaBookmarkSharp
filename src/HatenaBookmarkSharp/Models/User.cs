@@ -1,11 +1,12 @@
-﻿using System.Text.Json.Serialization;
+﻿#nullable enable
+using System.Text.Json.Serialization;
 
 namespace HatenaBookmarkSharp.Models
 {
     public class User
     {
         [JsonPropertyName("name")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [JsonPropertyName("plususer")]
         public bool IsPlusUser { get; set; }

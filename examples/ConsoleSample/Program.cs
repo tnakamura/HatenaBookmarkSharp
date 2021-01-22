@@ -74,12 +74,18 @@ namespace ConsoleSample
             var user = await client.GetMyAsync();
             Console.WriteLine(nameof(client.GetMyAsync));
             Console.WriteLine(user.Name);
+            Console.WriteLine($"{user.IsPlusUser}");
+            Console.WriteLine($"{user.IsPrivate}");
+            Console.WriteLine($"{user.IsOAuthTwitter}");
+            Console.WriteLine($"{user.IsOAuthFacebook}");
+            Console.WriteLine($"{user.IsOAuthEvernote}");
+            Console.WriteLine($"{user.IsOAuthMixiCheck}");
 
             var tags = await client.GetMyTagsAsync();
             Console.WriteLine(nameof(client.GetMyTagsAsync));
             foreach (var tag in tags.Tags)
             {
-                Console.WriteLine(tag.Name);
+                Console.WriteLine($"{tag.Name}({tag.Count})");
             }
 
             var url = new Uri("https://tnakamura.hatenablog.com");
@@ -88,16 +94,26 @@ namespace ConsoleSample
                 new PostRequest
                 {
                     Uri = url,
-                    Comment = "Test",
+                    Comment = "[blog]Test",
                 });
             Console.WriteLine(nameof(client.PostBookmarkAsync));
             Console.WriteLine(postedBookmark.Permalink);
             Console.WriteLine(postedBookmark.Comment);
+            Console.WriteLine(postedBookmark.User);
+            foreach (var tag in postedBookmark.Tags)
+            {
+                Console.WriteLine(tag);
+            }
 
             var bookmark = await client.GetBookmarkAsync(url);
             Console.WriteLine(nameof(client.GetBookmarkAsync));
             Console.WriteLine(bookmark.Permalink);
             Console.WriteLine(bookmark.Comment);
+            Console.WriteLine(bookmark.User);
+            foreach (var tag in bookmark.Tags)
+            {
+                Console.WriteLine(tag);
+            }
 
             var entry = await client.GetEntryAsync(url);
             Console.WriteLine(nameof(client.GetEntryAsync));

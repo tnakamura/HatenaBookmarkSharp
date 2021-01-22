@@ -1,12 +1,13 @@
-﻿using System;
+﻿#nullable enable
+using System;
 
 namespace HatenaBookmarkSharp.OAuth
 {
     internal abstract class Token
     {
-        public string Key { get; private set; }
+        public string Key { get; }
 
-        public string Secret { get; private set; }
+        public string Secret { get; }
 
         protected Token(string key, string secret)
         {

@@ -1,15 +1,16 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Text.Json.Serialization;
 
 namespace HatenaBookmarkSharp
 {
-    public class PostRequest
+    public sealed class PostRequest
     {
         [JsonPropertyName("url")]
-        public Uri Uri { get; set; }
+        public Uri? Uri { get; set; }
 
         [JsonPropertyName("comment")]
-        public string Comment { get; set; }
+        public string? Comment { get; set; }
 
         [JsonPropertyName("post_twitter")]
         public bool IsPostTwitter { get; set; }

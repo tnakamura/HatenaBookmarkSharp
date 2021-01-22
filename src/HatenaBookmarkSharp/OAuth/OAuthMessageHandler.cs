@@ -47,18 +47,20 @@ namespace HatenaBookmarkSharp.OAuth
                 Enumerable.Empty<KeyValuePair<string, string>>();
         }
 
-        protected async override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, System.Threading.CancellationToken cancellationToken)
+        protected async override Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request,
+            System.Threading.CancellationToken cancellationToken)
         {
             var sendParameter = parameters;
             if (request.Method == HttpMethod.Post)
             {
-                // form url encoded content
                 if (request.Content is FormUrlEncodedContent)
                 {
-                    // url encoded string
                     var extraParameter = await request.Content.ReadAsStringAsync()
                         .ConfigureAwait(false);
-                    var parsed = Utility.ParseQueryString(extraParameter, true); // url decoded
+
+                    var parsed = Utility.ParseQueryString(extraParameter, true);
+
                     sendParameter = sendParameter.Concat(parsed);
 
                     request.Content = new FormUrlEncodedContentEx(parsed);

@@ -30,16 +30,30 @@ namespace HatenaBookmarkSharp.OAuth
         {
             var client = new HttpClient(handler);
 
-            var response = await client.PostAsync(url, postValue ?? new FormUrlEncodedContent(Enumerable.Empty<KeyValuePair<string, string>>())).ConfigureAwait(false);
-            var tokenBase = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+            var response = await client.PostAsync(
+                url,
+                postValue ?? new FormUrlEncodedContent(
+                    Enumerable.Empty<KeyValuePair<string, string>>()),
+                cancellationToken)
+                .ConfigureAwait(false);
+
+            var tokenBase = await response.Content.ReadAsStringAsync()
+                .ConfigureAwait(false);
 
             if (response.StatusCode != System.Net.HttpStatusCode.OK)
             {
-                throw new HttpRequestException(response.StatusCode + ":" + tokenBase); // error message
+                throw new HttpRequestException(
+                    response.StatusCode + ":" + tokenBase);
             }
 
-            var splitted = tokenBase.Split('&').Select(s => s.Split('=')).ToLookup(xs => xs[0], xs => xs[1]);
-            var token = tokenFactory(splitted["oauth_token"].First().UrlDecode(), splitted["oauth_token_secret"].First().UrlDecode());
+            var splitted = tokenBase.Split('&')
+                .Select(s => s.Split('='))
+                .ToLookup(xs => xs[0], xs => xs[1]);
+
+            var token = tokenFactory(
+                splitted["oauth_token"].First().UrlDecode(),
+                splitted["oauth_token_secret"].First().UrlDecode());
+
             var extraData = splitted.Where(kvp => kvp.Key != "oauth_token" && kvp.Key != "oauth_token_secret")
                 .SelectMany(g => g, (g, value) => new { g.Key, Value = value })
                 .ToLookup(kvp => kvp.Key, kvp => kvp.Value);
@@ -60,10 +74,7 @@ namespace HatenaBookmarkSharp.OAuth
             HttpContent? postValue = null,
             CancellationToken cancellationToken = default)
         {
-            if (requestTokenUrl == null)
-            {
-                throw new ArgumentNullException(nameof(requestTokenUrl));
-            }
+            if (requestTokenUrl == null) throw new ArgumentNullException(nameof(requestTokenUrl));
 
             var handler = new OAuthMessageHandler(
                 consumerKey,
@@ -91,10 +102,20 @@ namespace HatenaBookmarkSharp.OAuth
             if (requestToken == null) throw new ArgumentNullException(nameof(requestToken));
             if (verifier == null) throw new ArgumentNullException(nameof(verifier));
 
-            var verifierParam = new KeyValuePair<string, string>("oauth_verifier", verifier.Trim());
+            var verifierParam = new KeyValuePair<string, string>(
+                "oauth_verifier",
+                verifier.Trim());
 
-            if (parameters == null) parameters = Enumerable.Empty<KeyValuePair<string, string>>();
-            var handler = new OAuthMessageHandler(consumerKey, consumerSecret, token: requestToken, optionalOAuthHeaderParameters: parameters.Concat(new[] { verifierParam }));
+            if (parameters == null)
+            {
+                parameters = Enumerable.Empty<KeyValuePair<string, string>>();
+            }
+
+            var handler = new OAuthMessageHandler(
+                consumerKey,
+                consumerSecret,
+                token: requestToken,
+                optionalOAuthHeaderParameters: parameters.Concat(new[] { verifierParam }));
 
             return GetTokenResponse(
                 accessTokenUrl,

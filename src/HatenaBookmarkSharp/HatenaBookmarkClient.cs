@@ -9,7 +9,7 @@ using HatenaBookmarkSharp.Models;
 
 namespace HatenaBookmarkSharp
 {
-    public partial class HatenaBookmarkClient : IHatenaBookmarkClient
+    public sealed class HatenaBookmarkClient : IHatenaBookmarkClient
     {
         readonly HttpClient httpClient;
 
@@ -83,21 +83,26 @@ namespace HatenaBookmarkSharp
             PostRequest parameter,
             CancellationToken cancellationToken = default)
         {
+            var requestBody = new Dictionary<string, string>
+            {
+                ["url"] = parameter.Uri!.ToString(),
+                ["post_twitter"] = parameter.IsPostTwitter.ToString(),
+                ["post_facebook"] = parameter.IsPostFacebook.ToString(),
+                ["post_mixi"] = parameter.IsPostMixi.ToString(),
+                ["post_evernote"] = parameter.IsPostEvernote.ToString(),
+                ["send_mail"] = parameter.IsSendMail.ToString(),
+                ["private"] = parameter.IsPrivate.ToString(),
+            };
+            if (parameter.Comment != null)
+            {
+                requestBody["comment"] = parameter.Comment;
+            }
+
             var request = new HttpRequestMessage(
                 HttpMethod.Post,
                 "/rest/1/my/bookmark")
             {
-                Content = new FormUrlEncodedContent(new Dictionary<string, string>
-                {
-                    ["url"] = parameter.Uri.ToString(),
-                    ["comment"] = parameter.Comment.ToString(),
-                    ["post_twitter"] = parameter.IsPostTwitter.ToString(),
-                    ["post_facebook"] = parameter.IsPostFacebook.ToString(),
-                    ["post_mixi"] = parameter.IsPostMixi.ToString(),
-                    ["post_evernote"] = parameter.IsPostEvernote.ToString(),
-                    ["send_mail"] = parameter.IsSendMail.ToString(),
-                    ["private"] = parameter.IsPrivate.ToString(),
-                }),
+                Content = new FormUrlEncodedContent(requestBody),
             };
 
             var response = await SendAsync(request, cancellationToken)
