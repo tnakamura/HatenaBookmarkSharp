@@ -4,9 +4,8 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using ConsoleAppFramework;
 using HatenaBookmarkSharp;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Options;
 
 namespace ConsoleSample
 {
@@ -15,25 +14,24 @@ namespace ConsoleSample
         static async Task Main(string[] args)
         {
             await Host.CreateDefaultBuilder()
-                .ConfigureServices((hostContext, services) =>
-                {
-                    services.Configure<HatenaBookmarkClientOptions>(hostContext.Configuration);
-                })
                 .RunConsoleAppFrameworkAsync<Program>(args);
         }
 
-        readonly IOptions<HatenaBookmarkClientOptions> options;
+        readonly IConfiguration configuration;
 
-        public Program(IOptions<HatenaBookmarkClientOptions> options)
+        public Program(IConfiguration configuration)
         {
-            this.options = options;
+            this.configuration = configuration;
         }
 
         public async Task Run()
         {
+            var consumerKey = configuration["OAuthConsumerKey"];
+            var consumerSecret = configuration["OAuthConsumerSecret"];
+
             var authorizer = new HatenaAuthorizer(
-                consumerKey: options.Value.OAuthConsumerKey!,
-                consumerSecret: options.Value.OAuthConsumerSecret);
+                consumerKey: consumerKey,
+                consumerSecret: consumerSecret);
 
             var requestToken = await authorizer.GetRequestTokenAsync(
                 scope: Scopes.ReadPublic | Scopes.ReadPrivate);
@@ -68,8 +66,8 @@ namespace ConsoleSample
                 verifier: verifier);
 
             var client = new HatenaBookmarkClient(
-                consumerKey: options.Value.OAuthConsumerKey!,
-                consumerSecret: options.Value.OAuthConsumerSecret!,
+                consumerKey: consumerKey,
+                consumerSecret: consumerSecret,
                 oauthToken: accessToken.OAuthToken,
                 oauthTokenSecret: accessToken.OAuthTokenSecret);
 
