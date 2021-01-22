@@ -31,12 +31,14 @@ namespace ConsoleSample
 
         public async Task Run()
         {
-            var client = new HatenaBookmarkClient(
-                options: options.Value);
+            var authorizer = new HatenaAuthorizer(
+                consumerKey: options.Value.OAuthConsumerKey!,
+                consumerSecret: options.Value.OAuthConsumerSecret);
 
-            var requestToken = await client.GetRequestTokenAsync();
+            var requestToken = await authorizer.GetRequestTokenAsync(
+                scope: Scopes.ReadPublic | Scopes.ReadPrivate);
 
-            var authenticationUri = client.GenerateAuthenticationUri(
+            var authenticationUri = authorizer.GenerateAuthenticationUri(
                 requestToken.OAuthToken);
             Console.WriteLine(authenticationUri);
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
@@ -58,12 +60,18 @@ namespace ConsoleSample
 
             Console.Write("authenticationCode:");
 
-            var authenticationCode = Console.ReadLine();
+            var verifier = Console.ReadLine();
 
-            var accessToken = await client.GetAccessTokenAsync(
-                authenticationCode,
-                requestToken);
-            client.SetAccessToken(accessToken.OAuthToken);
+            var accessToken = await authorizer.GetAccessTokenAsync(
+                oauthToken: requestToken.OAuthToken,
+                oauthTokenSecret: requestToken.OAuthTokenSecret,
+                verifier: verifier);
+
+            var client = new HatenaBookmarkClient(
+                consumerKey: options.Value.OAuthConsumerKey!,
+                consumerSecret: options.Value.OAuthConsumerSecret!,
+                oauthToken: accessToken.OAuthToken,
+                oauthTokenSecret: accessToken.OAuthTokenSecret);
 
             var user = await client.GetMyAsync();
             Console.WriteLine(user.Name);

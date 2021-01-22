@@ -4,13 +4,13 @@ namespace HatenaBookmarkSharp.Models
     public sealed class AccessToken
     {
         public AccessToken(
-            string oAuthToken,
-            string oAuthTokenSecret,
+            string oauthToken,
+            string oauthTokenSecret,
             string urlName,
             string displayName)
         {
-            OAuthToken = oAuthToken;
-            OAuthTokenSecret = oAuthTokenSecret;
+            OAuthToken = oauthToken;
+            OAuthTokenSecret = oauthTokenSecret;
             UrlName = urlName;
             DisplayName = displayName;
         }

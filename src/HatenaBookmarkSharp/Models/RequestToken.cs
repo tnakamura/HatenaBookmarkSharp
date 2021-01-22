@@ -5,13 +5,13 @@ namespace HatenaBookmarkSharp.Models
     public sealed class RequestToken
     {
         public RequestToken(
-            string oAuthToken,
-            string oAuthTokenSecret,
-            bool oAuthCallbackConfirmed)
+            string oauthToken,
+            string oauthTokenSecret,
+            bool oauthCallbackConfirmed)
         {
-            OAuthToken = oAuthToken;
-            OAuthTokenSecret = oAuthTokenSecret;
-            OAuthCallbackConfirmed = oAuthCallbackConfirmed;
+            OAuthToken = oauthToken;
+            OAuthTokenSecret = oauthTokenSecret;
+            OAuthCallbackConfirmed = oauthCallbackConfirmed;
         }
 
         public string OAuthToken { get; set; }

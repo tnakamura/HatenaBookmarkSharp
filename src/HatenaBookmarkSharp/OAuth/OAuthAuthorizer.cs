@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace HatenaBookmarkSharp.OAuth
@@ -23,7 +24,8 @@ namespace HatenaBookmarkSharp.OAuth
             string url,
             OAuthMessageHandler handler,
             HttpContent? postValue,
-            Func<string, string, T> tokenFactory)
+            Func<string, string, T> tokenFactory,
+            CancellationToken cancellationToken)
             where T : Token
         {
             var client = new HttpClient(handler);
@@ -55,20 +57,26 @@ namespace HatenaBookmarkSharp.OAuth
         public Task<TokenResponse<RequestToken>> GetRequestToken(
             string requestTokenUrl,
             IEnumerable<KeyValuePair<string, string>>? parameters = null,
-            HttpContent? postValue = null)
+            HttpContent? postValue = null,
+            CancellationToken cancellationToken = default)
         {
-            if (requestTokenUrl == null) throw new ArgumentNullException(nameof(requestTokenUrl));
+            if (requestTokenUrl == null)
+            {
+                throw new ArgumentNullException(nameof(requestTokenUrl));
+            }
 
             var handler = new OAuthMessageHandler(
                 consumerKey,
                 consumerSecret,
                 token: null,
                 optionalOAuthHeaderParameters: parameters);
+
             return GetTokenResponse(
                 requestTokenUrl,
                 handler,
                 postValue,
-                (key, secret) => new RequestToken(key, secret));
+                (key, secret) => new RequestToken(key, secret),
+                cancellationToken);
         }
 
         public Task<TokenResponse<AccessToken>> GetAccessToken(
@@ -76,7 +84,8 @@ namespace HatenaBookmarkSharp.OAuth
             RequestToken requestToken,
             string verifier,
             IEnumerable<KeyValuePair<string, string>>? parameters = null,
-            HttpContent? postValue = null)
+            HttpContent? postValue = null,
+            CancellationToken cancellationToken = default)
         {
             if (accessTokenUrl == null) throw new ArgumentNullException(nameof(accessTokenUrl));
             if (requestToken == null) throw new ArgumentNullException(nameof(requestToken));
@@ -91,7 +100,8 @@ namespace HatenaBookmarkSharp.OAuth
                 accessTokenUrl,
                 handler,
                 postValue,
-                (key, secret) => new AccessToken(key, secret));
+                (key, secret) => new AccessToken(key, secret),
+                cancellationToken);
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿#nullable enable
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Security.Cryptography;
 using System.Text.Json;
@@ -15,8 +14,6 @@ namespace HatenaBookmarkSharp
     {
         readonly HttpClient httpClient;
 
-        readonly HatenaBookmarkClientOptions options;
-
         static HatenaBookmarkClient()
         {
             OAuth.OAuthUtility.ComputeHash = (key, buffer) =>
@@ -26,12 +23,35 @@ namespace HatenaBookmarkSharp
         }
 
         public HatenaBookmarkClient(
-            HttpClient? httpClient = null,
-            HatenaBookmarkClientOptions? options = null)
+            string consumerKey,
+            string consumerSecret,
+            string oauthToken,
+            string oauthTokenSecret)
+            : this(
+                  consumerKey,
+                  consumerSecret,
+                  oauthToken,
+                  oauthTokenSecret,
+                  new HttpClientHandler())
         {
-            this.options = options ?? new HatenaBookmarkClientOptions(); ;
-            this.httpClient = httpClient ?? new HttpClient();
-            this.httpClient.BaseAddress = new Uri("https://bookmark.hatenaapis.com");
+        }
+
+        public HatenaBookmarkClient(
+            string consumerKey,
+            string consumerSecret,
+            string oauthToken,
+            string oauthTokenSecret,
+            HttpMessageHandler innerHandler)
+        {
+            httpClient = new HttpClient(
+                new OAuth.OAuthMessageHandler(
+                    innerHandler: innerHandler,
+                    consumerKey: consumerKey,
+                    consumerSecret: consumerSecret,
+                    token: new OAuth.AccessToken(
+                        key: oauthToken,
+                        secret: oauthTokenSecret)));
+            httpClient.BaseAddress = new Uri("https://bookmark.hatenaapis.com");
         }
 
         public Task<Bookmark> GetBookmarkAsync(
@@ -127,77 +147,6 @@ namespace HatenaBookmarkSharp
             options.Converters.Add(DateTimeConverter.Default);
             var result = JsonSerializer.Deserialize<T>(json, options);
             return result!;
-        }
-
-        public async Task<RequestToken> GetRequestTokenAsync(CancellationToken cancellationToken = default)
-        {
-            var authorizer = CreateAuthorizer();
-
-            var response = await authorizer.GetRequestToken(
-                requestTokenUrl: "https://www.hatena.com/oauth/initiate",
-                parameters: new Dictionary<string, string>
-                {
-                    ["oauth_callback"] = "oob",
-                },
-                postValue: new FormUrlEncodedContent(new Dictionary<string, string>
-                {
-                    ["scope"] = options.Scope!,
-                }));
-
-            var callbackConfirmed = response.ExtraData["oauth_callback_confirmed"]
-                .Select(x => bool.Parse(x))
-                .FirstOrDefault();
-
-            return new RequestToken(
-                oAuthToken: response.Token.Key,
-                oAuthTokenSecret: response.Token.Secret,
-                oAuthCallbackConfirmed: callbackConfirmed);
-        }
-
-        OAuth.OAuthAuthorizer CreateAuthorizer()
-        {
-            if (options.OAuthConsumerKey == null ||
-                options.OAuthConsumerSecret == null)
-            {
-                throw new InvalidOperationException();
-            }
-            return new OAuth.OAuthAuthorizer(
-                consumerKey: options.OAuthConsumerKey,
-                consumerSecret: options.OAuthConsumerSecret);
-        }
-
-        public Uri GenerateAuthenticationUri(string requestToken)
-        {
-            return new Uri(
-                $"https://www.hatena.ne.jp/oauth/authorize?oauth_token={requestToken}");
-        }
-
-        public async Task<AccessToken> GetAccessTokenAsync(
-            string authenticationCode,
-            RequestToken requestToken,
-            CancellationToken cancellationToken = default)
-        {
-            var authorizer = CreateAuthorizer();
-
-            var response = await authorizer.GetAccessToken(
-                "https://www.hatena.com/oauth/token",
-                requestToken: new OAuth.RequestToken(
-                    key: requestToken.OAuthToken,
-                    secret: requestToken.OAuthTokenSecret),
-                verifier: authenticationCode);
-
-            var urlName = response.ExtraData["url_name"].FirstOrDefault() ?? "";
-            var displayName = response.ExtraData["display_name"].FirstOrDefault() ?? "";
-            return new AccessToken(
-                oAuthToken: response.Token.Key,
-                oAuthTokenSecret: response.Token.Secret,
-                urlName: urlName,
-                displayName: displayName);
-        }
-
-        public void SetAccessToken(string accessToken)
-        {
-            options.AccessToken = accessToken;
         }
     }
 }

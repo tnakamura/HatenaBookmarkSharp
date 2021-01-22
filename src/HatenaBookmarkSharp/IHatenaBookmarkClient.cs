@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,14 +20,5 @@ namespace HatenaBookmarkSharp
         Task<IReadOnlyList<Tag>> GetMyTagsAsync(CancellationToken cancellationToken = default);
 
         Task<User> GetMyAsync(CancellationToken cancellationToken = default);
-
-        Task<RequestToken> GetRequestTokenAsync(CancellationToken cancellationToken = default);
-
-        Task<AccessToken> GetAccessTokenAsync(
-            string authenticationCode,
-            RequestToken requestToken,
-            CancellationToken cancellationToken = default);
-
-        Uri GenerateAuthenticationUri(string requestToken);
     }
 }
