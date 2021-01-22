@@ -6,8 +6,13 @@ namespace HatenaBookmarkSharp
 {
     public sealed class PostRequest
     {
+        public PostRequest(Uri uri)
+        {
+            Uri = uri;
+        }
+
         [JsonPropertyName("url")]
-        public Uri? Uri { get; set; }
+        public Uri Uri { get; }
 
         [JsonPropertyName("comment")]
         public string? Comment { get; set; }

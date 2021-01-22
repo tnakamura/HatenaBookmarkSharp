@@ -1,6 +1,6 @@
 ﻿#nullable enable
 
-namespace HatenaBookmarkSharp.Models
+namespace HatenaBookmarkSharp
 {
     public sealed class RequestToken
     {

@@ -306,17 +306,17 @@ namespace HatenaBookmarkSharp.Tests
                 oauthToken: OAuthToken,
                 oauthTokenSecret: OAuthTokenSecret,
                 innerHandler: mock.Object);
-            var bookmark = await client.PostBookmarkAsync(new PostRequest
-            {
-                Uri = new Uri("https://tnakamura.hatenablog.com"),
-                Comment = "[blog]self bookmarked",
-                IsPostMixi = false,
-                IsPostEvernote = true,
-                IsPostTwitter = true,
-                IsPostFacebook = false,
-                IsPrivate = true,
-                IsSendMail = false,
-            });
+            var bookmark = await client.PostBookmarkAsync(
+                new PostRequest(new Uri("https://tnakamura.hatenablog.com"))
+                {
+                    Comment = "[blog]self bookmarked",
+                    IsPostMixi = false,
+                    IsPostEvernote = true,
+                    IsPostTwitter = true,
+                    IsPostFacebook = false,
+                    IsPrivate = true,
+                    IsSendMail = false,
+                });
 
             Assert.NotNull(bookmark);
             Assert.Equal("4648574598291681089", bookmark.Id);

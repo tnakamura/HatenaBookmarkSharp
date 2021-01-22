@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace HatenaBookmarkSharp.Models
+namespace HatenaBookmarkSharp
 {
     public sealed class Bookmark
     {

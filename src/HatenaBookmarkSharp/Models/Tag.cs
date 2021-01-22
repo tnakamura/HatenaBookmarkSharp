@@ -1,7 +1,7 @@
 ﻿#nullable enable
 using System.Text.Json.Serialization;
 
-namespace HatenaBookmarkSharp.Models
+namespace HatenaBookmarkSharp
 {
     public class Tag
     {
