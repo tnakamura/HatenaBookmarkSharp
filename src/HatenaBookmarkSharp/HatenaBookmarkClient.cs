@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
-using System.Security.Cryptography;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,14 +12,6 @@ namespace HatenaBookmarkSharp
     public partial class HatenaBookmarkClient : IHatenaBookmarkClient
     {
         readonly HttpClient httpClient;
-
-        static HatenaBookmarkClient()
-        {
-            OAuth.OAuthUtility.ComputeHash = (key, buffer) =>
-            {
-                return new HMACSHA1(key).ComputeHash(buffer);
-            };
-        }
 
         public HatenaBookmarkClient(
             string consumerKey,
@@ -79,12 +70,13 @@ namespace HatenaBookmarkSharp
                 cancellationToken);
         }
 
-        public Task<IReadOnlyList<Tag>> GetMyTagsAsync(
+        public async Task<TagsResponse> GetMyTagsAsync(
             CancellationToken cancellationToken = default)
         {
-            return GetAsync<IReadOnlyList<Tag>>(
+            return await GetAsync<TagsResponse>(
                 $"/rest/1/my/tags",
-                cancellationToken);
+                cancellationToken)
+                .ConfigureAwait(false);
         }
 
         public async Task<Bookmark> PostBookmarkAsync(

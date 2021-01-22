@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace HatenaBookmarkSharp.Models
 {
@@ -10,11 +9,5 @@ namespace HatenaBookmarkSharp.Models
 
         [JsonPropertyName("count")]
         public int Count { get; set; }
-
-        [JsonPropertyName("modified_datetime")]
-        public DateTime ModifiedDateTime { get; set; }
-
-        [JsonPropertyName("modified_epoch")]
-        public long ModifiedEpoch { get; set; }
     }
 }

@@ -3,17 +3,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace HatenaBookmarkSharp.OAuth
 {
     internal static class OAuthUtility
     {
-        public delegate byte[] HashFunction(byte[] key, byte[] buffer);
-
         static readonly Random random = new Random();
 
-        public static HashFunction? ComputeHash { private get; set; }
+        static byte[] ComputeHash(byte[] key, byte[] buffer)
+        {
+            return new HMACSHA1(key).ComputeHash(buffer);
+        }
 
         public static IEnumerable<KeyValuePair<string, string>> BuildBasicParameters(
             string consumerKey,
@@ -61,12 +63,6 @@ namespace HatenaBookmarkSharp.OAuth
             Token? token,
             IEnumerable<KeyValuePair<string, string>> parameters)
         {
-            if (ComputeHash == null)
-            {
-                throw new InvalidOperationException(
-                    "ComputeHash is null, must initialize before call OAuthUtility.HashFunction = /* your computeHash code */ at once.");
-            }
-
             var hmacKeyBase = consumerSecret.UrlEncode() +
                 "&" +
                 ((token == null) ? "" : token.Secret).UrlEncode();

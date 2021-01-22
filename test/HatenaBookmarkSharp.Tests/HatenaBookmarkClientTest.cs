@@ -230,20 +230,18 @@ namespace HatenaBookmarkSharp.Tests
                     {
                         StatusCode = HttpStatusCode.OK,
                         Content = new StringContent(
-                        $@"[
-                             {{
-                                 ""tag"": ""blog"",
-                                 ""count"": 1,
-                                 ""modified_datetime"": ""{now:R}"",
-                                 ""modified_epoch"": {now.ToUnixTime()}
-                             }},
-                             {{
-                                 ""tag"": ""csharp"",
-                                 ""count"": 2,
-                                 ""modified_datetime"": ""{now:R}"",
-                                 ""modified_epoch"": {now.ToUnixTime()}
-                             }}
-                            ]",
+                        $@"{{
+                             ""tags"": [
+                               {{
+                                   ""tag"": ""blog"",
+                                   ""count"": 1
+                               }},
+                               {{
+                                   ""tag"": ""csharp"",
+                                   ""count"": 2
+                               }}
+                              ]
+                            }}",
                         Encoding.UTF8,
                         "application/json"),
                     });
@@ -255,12 +253,12 @@ namespace HatenaBookmarkSharp.Tests
                 oauthToken: OAuthToken,
                 oauthTokenSecret: OAuthTokenSecret,
                 innerHandler: mock.Object);
-            var tags = await client.GetMyTagsAsync();
+            var response = await client.GetMyTagsAsync();
 
-            Assert.NotNull(tags);
-            Assert.Equal(2, tags.Count);
-            Assert.Equal("blog", tags[0].Name);
-            Assert.Equal("csharp", tags[1].Name);
+            Assert.NotNull(response);
+            Assert.Equal(2, response.Tags.Count);
+            Assert.Equal("blog", response.Tags[0].Name);
+            Assert.Equal("csharp", response.Tags[1].Name);
             mock.VerifyAll();
         }
 

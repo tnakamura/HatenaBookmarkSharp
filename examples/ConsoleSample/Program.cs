@@ -34,7 +34,7 @@ namespace ConsoleSample
                 consumerSecret: consumerSecret);
 
             var requestToken = await authorizer.GetRequestTokenAsync(
-                scope: Scopes.ReadPublic | Scopes.ReadPrivate);
+                scope: Scopes.All);
 
             var authenticationUri = authorizer.GenerateAuthenticationUri(
                 requestToken.OAuthToken);
@@ -56,7 +56,7 @@ namespace ConsoleSample
                 Process.Start("open", authenticationUri.ToString());
             }
 
-            Console.Write("authenticationCode:");
+            Console.Write("verifier:");
 
             var verifier = Console.ReadLine();
 
@@ -72,10 +72,12 @@ namespace ConsoleSample
                 oauthTokenSecret: accessToken.OAuthTokenSecret);
 
             var user = await client.GetMyAsync();
+            Console.WriteLine(nameof(client.GetMyAsync));
             Console.WriteLine(user.Name);
 
             var tags = await client.GetMyTagsAsync();
-            foreach (var tag in tags)
+            Console.WriteLine(nameof(client.GetMyTagsAsync));
+            foreach (var tag in tags.Tags)
             {
                 Console.WriteLine(tag.Name);
             }
@@ -88,10 +90,20 @@ namespace ConsoleSample
                     Uri = url,
                     Comment = "Test",
                 });
+            Console.WriteLine(nameof(client.PostBookmarkAsync));
+            Console.WriteLine(postedBookmark.Permalink);
+            Console.WriteLine(postedBookmark.Comment);
 
             var bookmark = await client.GetBookmarkAsync(url);
+            Console.WriteLine(nameof(client.GetBookmarkAsync));
+            Console.WriteLine(bookmark.Permalink);
+            Console.WriteLine(bookmark.Comment);
 
             var entry = await client.GetEntryAsync(url);
+            Console.WriteLine(nameof(client.GetEntryAsync));
+            Console.WriteLine(entry.Title);
+            Console.WriteLine(entry.EntryUrl);
+            Console.WriteLine(entry.SmartPhoneAppEntryUrl);
 
             await client.DeleteBookmarkAsync(url);
         }
