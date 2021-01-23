@@ -9,7 +9,7 @@ PM> Install-Package HatenaBookmarkSharp
 ```
 
 ```sh
-dotnet add package HatenaBookmarkSharp
+$ dotnet add package HatenaBookmarkSharp
 ```
 
 ## Usage
@@ -60,7 +60,7 @@ var user = await client.GetMyAsync();
 var tags = await client.GetMyTagsAsync();
 
 var url = new Uri("https://tnakamura.hatenablog.com");
-var postedBookmark = await client.CreateBookmarkAsync(
+var createdBookmark = await client.CreateBookmarkAsync(
     new NewBookmark(url)
     {
         Comment = "[blog]Test",
