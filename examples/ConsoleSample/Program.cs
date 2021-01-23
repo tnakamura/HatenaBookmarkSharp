@@ -90,12 +90,12 @@ namespace ConsoleSample
 
             var url = new Uri("https://tnakamura.hatenablog.com");
 
-            var postedBookmark = await client.PostBookmarkAsync(
-                new PostRequest(url)
+            var postedBookmark = await client.CreateBookmarkAsync(
+                new NewBookmark(url)
                 {
                     Comment = "[blog]Test",
                 });
-            Console.WriteLine(nameof(client.PostBookmarkAsync));
+            Console.WriteLine(nameof(client.CreateBookmarkAsync));
             Console.WriteLine(postedBookmark.Permalink);
             Console.WriteLine(postedBookmark.Comment);
             Console.WriteLine(postedBookmark.User);

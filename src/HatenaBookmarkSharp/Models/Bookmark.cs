@@ -7,14 +7,8 @@ namespace HatenaBookmarkSharp
 {
     public sealed class Bookmark
     {
-        [JsonPropertyName("eid")]
-        public string? Id { get; set; }
-
         [JsonPropertyName("comment")]
         public string? Comment { get; set; }
-
-        [JsonPropertyName("comment_raw")]
-        public string? CommentRaw { get; set; }
 
         [JsonPropertyName("created_datetime")]
         public DateTime CreatedDateTime { get; set; }

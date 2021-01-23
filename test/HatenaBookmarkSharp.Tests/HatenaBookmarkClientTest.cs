@@ -36,9 +36,7 @@ namespace HatenaBookmarkSharp.Tests
                         StatusCode = HttpStatusCode.OK,
                         Content = new StringContent(
                         $@"{{
-                            ""eid"": ""4648574598291681089"",
                             ""comment"": ""self bookmarked"",
-                            ""comment_raw"": ""[blog]self bookmarked"",
                             ""created_datetime"": ""{now:R}"",
                             ""created_epoch"": {now.ToUnixTime()},
                             ""user"": ""griefworker"",
@@ -63,9 +61,7 @@ namespace HatenaBookmarkSharp.Tests
                 new Uri("https://tnakamura.hatenablog.com"));
 
             Assert.NotNull(bookmark);
-            Assert.Equal("4648574598291681089", bookmark.Id);
             Assert.Equal("self bookmarked", bookmark.Comment);
-            Assert.Equal("[blog]self bookmarked", bookmark.CommentRaw);
             Assert.Single(bookmark.Tags);
             Assert.Equal("blog", bookmark.Tags[0]);
             mock.VerifyAll();
@@ -283,9 +279,7 @@ namespace HatenaBookmarkSharp.Tests
                         StatusCode = HttpStatusCode.OK,
                         Content = new StringContent(
                         $@"{{
-                            ""eid"": ""4648574598291681089"",
                             ""comment"": ""self bookmarked"",
-                            ""comment_raw"": ""[blog]self bookmarked"",
                             ""created_datetime"": ""{now:R}"",
                             ""created_epoch"": {now.ToUnixTime()},
                             ""user"": ""griefworker"",
@@ -306,8 +300,8 @@ namespace HatenaBookmarkSharp.Tests
                 oauthToken: OAuthToken,
                 oauthTokenSecret: OAuthTokenSecret,
                 innerHandler: mock.Object);
-            var bookmark = await client.PostBookmarkAsync(
-                new PostRequest(new Uri("https://tnakamura.hatenablog.com"))
+            var bookmark = await client.CreateBookmarkAsync(
+                new NewBookmark(new Uri("https://tnakamura.hatenablog.com"))
                 {
                     Comment = "[blog]self bookmarked",
                     IsPostMixi = false,
@@ -319,7 +313,6 @@ namespace HatenaBookmarkSharp.Tests
                 });
 
             Assert.NotNull(bookmark);
-            Assert.Equal("4648574598291681089", bookmark.Id);
             Assert.Equal("self bookmarked", bookmark.Comment);
             Assert.Equal(
                 new Uri("https://tnakamura.hatenablog.com/"),

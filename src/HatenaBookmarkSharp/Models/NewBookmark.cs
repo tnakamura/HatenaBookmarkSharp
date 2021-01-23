@@ -4,9 +4,9 @@ using System.Text.Json.Serialization;
 
 namespace HatenaBookmarkSharp
 {
-    public sealed class PostRequest
+    public sealed class NewBookmark
     {
-        public PostRequest(Uri uri)
+        public NewBookmark(Uri uri)
         {
             Uri = uri;
         }

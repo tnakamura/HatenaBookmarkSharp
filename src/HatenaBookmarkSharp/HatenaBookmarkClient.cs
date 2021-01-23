@@ -87,23 +87,23 @@ namespace HatenaBookmarkSharp
                 .ConfigureAwait(false);
         }
 
-        public async Task<Bookmark> PostBookmarkAsync(
-            PostRequest parameter,
+        public async Task<Bookmark> CreateBookmarkAsync(
+            NewBookmark bookmark,
             CancellationToken cancellationToken = default)
         {
             var requestBody = new Dictionary<string, string>
             {
-                ["url"] = parameter.Uri!.ToString(),
-                ["post_twitter"] = parameter.IsPostTwitter.ToString(),
-                ["post_facebook"] = parameter.IsPostFacebook.ToString(),
-                ["post_mixi"] = parameter.IsPostMixi.ToString(),
-                ["post_evernote"] = parameter.IsPostEvernote.ToString(),
-                ["send_mail"] = parameter.IsSendMail.ToString(),
-                ["private"] = parameter.IsPrivate.ToString(),
+                ["url"] = bookmark.Uri!.ToString(),
+                ["post_twitter"] = bookmark.IsPostTwitter.ToString(),
+                ["post_facebook"] = bookmark.IsPostFacebook.ToString(),
+                ["post_mixi"] = bookmark.IsPostMixi.ToString(),
+                ["post_evernote"] = bookmark.IsPostEvernote.ToString(),
+                ["send_mail"] = bookmark.IsSendMail.ToString(),
+                ["private"] = bookmark.IsPrivate.ToString(),
             };
-            if (parameter.Comment != null)
+            if (bookmark.Comment != null)
             {
-                requestBody["comment"] = parameter.Comment;
+                requestBody["comment"] = bookmark.Comment;
             }
 
             var request = new HttpRequestMessage(
@@ -119,9 +119,9 @@ namespace HatenaBookmarkSharp
             var responseBody = await response.Content.ReadAsStringAsync()
                 .ConfigureAwait(false);
 
-            var bookmark = Deserialize<Bookmark>(responseBody);
+            var createdBookmark = Deserialize<Bookmark>(responseBody);
 
-            return bookmark!;
+            return createdBookmark;
         }
 
         public async Task DeleteBookmarkAsync(

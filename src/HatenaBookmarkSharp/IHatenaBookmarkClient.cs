@@ -9,7 +9,7 @@ namespace HatenaBookmarkSharp
     {
         Task<Bookmark> GetBookmarkAsync(Uri uri, CancellationToken cancellationToken = default);
 
-        Task<Bookmark> PostBookmarkAsync(PostRequest parameter, CancellationToken cancellationToken = default);
+        Task<Bookmark> CreateBookmarkAsync(NewBookmark bookmark, CancellationToken cancellationToken = default);
 
         Task DeleteBookmarkAsync(Uri uri, CancellationToken cancellationToken = default);
 
