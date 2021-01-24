@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>8.0</LangVersion>
-    <Version>0.0.1</Version>
+    <Version>0.0.2</Version>
     <Authors>tnakamura</Authors>
     <Company>tnakamura</Company>
     <Copyright>tnakamura</Copyright>
@@ -13,6 +13,8 @@
     <RepositoryUrl>https://github.com/tnakamura/HatenaBookmarkSharp.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageProjectUrl>https://github.com/tnakamura/HatenaBookmarkSharp</PackageProjectUrl>
+    <PackageTags>api client hatena</PackageTags>
+    <Description>Hatena Bookmark Web API Client for C#</Description>
   </PropertyGroup>
 
   <ItemGroup>
