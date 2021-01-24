@@ -59,7 +59,7 @@ namespace HatenaBookmarkSharp.OAuth
                     var extraParameter = await request.Content.ReadAsStringAsync()
                         .ConfigureAwait(false);
 
-                    var parsed = Utility.ParseQueryString(extraParameter, true);
+                    var parsed = OAuthUtility.ParseQueryString(extraParameter, true);
 
                     sendParameter = sendParameter.Concat(parsed);
 
