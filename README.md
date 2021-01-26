@@ -83,7 +83,7 @@ await client.DeleteBookmarkAsync(url);
 
 ## License
 
-[MIT](https://github.com/tnakamura/HatenaBookmarkSharp/blob/master/LICENCE)
+[MIT](https://github.com/tnakamura/HatenaBookmarkSharp/blob/main/LICENCE)
 
 ## Author
 
