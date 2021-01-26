@@ -2,7 +2,7 @@
 
 Hatena Bookmark Web API Client for C#.
 
-## Installation
+## Install
 
 ```sh
 PM> Install-Package HatenaBookmarkSharp
@@ -73,10 +73,6 @@ var entry = await client.GetEntryAsync(url);
 await client.DeleteBookmarkAsync(url);
 ```
 
-## License
-
-MIT
-
 ## Contribution
 
 1. Fork it ( https://github.com/tnakamura/HatenaBookmarkSharp )
@@ -85,3 +81,10 @@ MIT
 4. Push to the branch (git push origin my-new-feature)
 5. Create new Pull Request
 
+## License
+
+[MIT](https://github.com/tnakamura/HatenaBookmarkSharp/blob/master/LICENCE)
+
+## Author
+
+[tnakamura](https://github.com/tnakamura)
