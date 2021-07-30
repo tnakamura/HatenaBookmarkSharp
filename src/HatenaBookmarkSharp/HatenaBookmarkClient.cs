@@ -128,9 +128,10 @@ namespace HatenaBookmarkSharp
             Uri uri,
             CancellationToken cancellationToken = default)
         {
+            var escapedUri = Uri.EscapeDataString(uri.ToString()); //httpの場合はURLエンコードしないと削除できない。httpsの場合は、URLエンコードはどちらでもOK。
             var request = new HttpRequestMessage(
                 HttpMethod.Delete,
-                $"/rest/1/my/bookmark?url={uri}");
+                $"/rest/1/my/bookmark?url={escapedUri}");
             await SendAsync(request, cancellationToken)
                 .ConfigureAwait(false);
         }
