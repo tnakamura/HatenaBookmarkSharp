@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/examples/">
+    <Project Path="examples/ConsoleSample/ConsoleSample.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/HatenaBookmarkSharp/HatenaBookmarkSharp.csproj" />
+  </Folder>
+  <Folder Name="/test/">
+    <Project Path="test/HatenaBookmarkSharp.Tests/HatenaBookmarkSharp.Tests.csproj" />
+  </Folder>
+</Solution>
